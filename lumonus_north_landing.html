@@ -1,0 +1,1741 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminate - Performance Management That Actually Works</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        /* Color scheme based on Lumonus brand */
+        :root {
+            --primary: #081e43;
+            --primary-dark: #081e43;
+            --secondary: #aaa1fd;
+            --accent: #3ea7b2;
+            --accent-2: #fb6a76;
+            --dark: #081e43;
+            --light: #fafaff;
+            --gray: #6b7280;
+            --gradient: linear-gradient(135deg, #081e43 0%, #aaa1fd 100%);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(170, 161, 253, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(62, 167, 178, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(251, 106, 118, 0.2) 0%, transparent 50%);
+            opacity: 0.6;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100%" height="100%" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:rgba(170,161,253,0.4);stop-opacity:0"/><stop offset="30%" style="stop-color:rgba(170,161,253,0.6);stop-opacity:1"/><stop offset="70%" style="stop-color:rgba(62,167,178,0.6);stop-opacity:1"/><stop offset="100%" style="stop-color:rgba(62,167,178,0.4);stop-opacity:0"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M0,300 Q200,200 400,280 T800,250 Q1000,220 1200,280" stroke="url(%23pathGrad)" stroke-width="2" fill="none" filter="url(%23glow)"><animate attributeName="stroke-dasharray" values="0,1000;1000,0;0,1000" dur="8s" repeatCount="indefinite"/></path><path d="M0,320 Q250,180 500,300 T900,270 Q1100,240 1200,300" stroke="url(%23pathGrad)" stroke-width="1.5" fill="none" opacity="0.7" filter="url(%23glow)"><animate attributeName="stroke-dasharray" values="500,500;0,1000;500,500" dur="6s" repeatCount="indefinite"/></path></svg>');
+            animation: pathPulse 12s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pathPulse {
+            0%, 100% { opacity: 0.4; transform: translateY(0px); }
+            50% { opacity: 0.8; transform: translateY(-5px); }
+        }
+
+        /* Floating light particles */
+        .hero .light-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .light-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float-light 8s infinite linear;
+        }
+
+        .light-particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; animation-duration: 6s; }
+        .light-particle:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; animation-duration: 8s; }
+        .light-particle:nth-child(3) { top: 40%; left: 30%; animation-delay: 2s; animation-duration: 7s; }
+        .light-particle:nth-child(4) { top: 80%; left: 60%; animation-delay: 3s; animation-duration: 9s; }
+        .light-particle:nth-child(5) { top: 10%; left: 70%; animation-delay: 4s; animation-duration: 5s; }
+        .light-particle:nth-child(6) { top: 70%; left: 20%; animation-delay: 1.5s; animation-duration: 6.5s; }
+
+        @keyframes float-light {
+            0% { 
+                transform: translateY(0px) scale(0.5); 
+                opacity: 0; 
+            }
+            10% { 
+                opacity: 0.8; 
+                transform: translateY(-10px) scale(1); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateY(-50px) scale(1.2); 
+            }
+            90% { 
+                opacity: 0.8; 
+                transform: translateY(-80px) scale(0.8); 
+            }
+            100% { 
+                transform: translateY(-100px) scale(0.5); 
+                opacity: 0; 
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-text .tagline {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product-preview {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 60px rgba(8, 30, 67, 0.15);
+            transform: perspective(1200px) rotateY(-12deg) rotateX(3deg);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .product-preview:hover {
+            transform: perspective(1200px) rotateY(-8deg) rotateX(1deg);
+            box-shadow: 0 35px 80px rgba(8, 30, 67, 0.2);
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .preview-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .dot.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .dot.yellow { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .dot.green { background: linear-gradient(135deg, #10b981, #059669); }
+
+        .preview-content {
+            color: var(--dark);
+        }
+
+        .preview-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .preview-title::before {
+            content: "👤";
+            font-size: 1.2rem;
+        }
+
+        .skills-container {
+            position: relative;
+        }
+
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            margin: 0.75rem 0;
+            background: linear-gradient(135deg, #fafaff, #f8fafc);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .skill-item:hover {
+            border-color: var(--secondary);
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(170, 161, 253, 0.15);
+        }
+
+        .skill-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .skill-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .skill-icon.prog { background: linear-gradient(135deg, var(--secondary), #9333ea); }
+        .skill-icon.desn { background: linear-gradient(135deg, var(--accent), #0891b2); }
+        .skill-icon.test { background: linear-gradient(135deg, #10b981, #059669); }
+        .skill-icon.scfg { background: linear-gradient(135deg, var(--accent-2), #e11d48); }
+        .skill-icon.scty { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        .skill-details {
+            flex: 1;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.05rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .skill-level {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .skill-drag {
+            color: var(--gray);
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .skill-item:hover .skill-drag {
+            opacity: 1;
+        }
+
+        .level-badge {
+            background: var(--gradient);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        /* Tooltip Styles */
+        .skill-tooltip {
+            position: absolute;
+            top: 50%;
+            left: 120%;
+            transform: translateY(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(8, 30, 67, 0.3);
+            width: 320px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .skill-tooltip.tooltip-left {
+            left: auto;
+            right: 120%;
+        }
+
+        .skill-tooltip.tooltip-center {
+            left: 50%;
+            top: -120%;
+            transform: translate(-50%, 0);
+        }
+
+        .skill-tooltip::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -8px;
+            transform: translateY(-50%);
+            border: 8px solid transparent;
+            border-right-color: var(--dark);
+        }
+
+        .skill-tooltip.tooltip-left::before {
+            left: auto;
+            right: -8px;
+            border-right-color: transparent;
+            border-left-color: var(--dark);
+        }
+
+        .skill-tooltip.tooltip-center::before {
+            top: auto;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-right-color: transparent;
+            border-left-color: transparent;
+            border-top-color: var(--dark);
+        }
+
+        .skill-item:hover .skill-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tooltip-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .tooltip-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .tooltip-section {
+            margin-bottom: 1rem;
+        }
+
+        .tooltip-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tooltip-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .example-item {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0.25rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .example-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--accent-2);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(251, 106, 118, 0.4);
+        }
+
+        .cta-button:hover {
+            background: #e55a6b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(251, 106, 118, 0.6);
+        }
+
+        /* Problem Section */
+        .problem {
+            padding: 6rem 0;
+            background: var(--light);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .problem-title {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .problem-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .problem-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+
+        .problem-item {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .problem-item h3 {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Solution Section */
+        .solution {
+            padding: 6rem 0;
+            background: white;
+        }
+
+        .solution h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 12px;
+            background: var(--light);
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .feature h3 {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 6rem 0;
+            background: var(--dark);
+            color: white;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(170, 161, 253, 0.2);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .step h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .step p {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Cultural Values Section */
+        .cultural-values {
+            padding: 6rem 0;
+            background: white;
+        }
+
+        .cultural-values h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .values-preview {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            align-items: start;
+            margin-bottom: 4rem;
+        }
+
+        .values-intro h3 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .values-intro p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .values-metrics {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .values-demo {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(8, 30, 67, 0.1);
+        }
+
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .demo-header h4 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .progress-bar-small {
+            width: 100px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill-small {
+            width: 75%;
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .value-cards-preview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .value-card-mini {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .value-card-mini.active {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 20px rgba(170, 161, 253, 0.2);
+        }
+
+        .value-card-mini:hover {
+            transform: translateY(-2px);
+        }
+
+        .value-icon-mini {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .care-team { background: var(--accent-2); }
+        .stay-curious { background: var(--secondary); }
+        .good-humans { background: #10b981; }
+        .find-way { background: var(--accent); }
+
+        .value-content-mini h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stars-mini {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .star-mini {
+            font-size: 1rem;
+            color: #e5e7eb;
+        }
+
+        .star-mini.filled {
+            color: #fbbf24;
+        }
+
+        .stars-mini.loading .star-mini {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        .value-content-mini p {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .awaiting {
+            color: var(--secondary);
+            font-style: italic;
+        }
+
+        .demo-examples {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .example-popup h6 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .example-popup ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .example-popup li {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .example-popup li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .values-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .values-feature {
+            text-align: center;
+            padding: 2rem;
+            background: var(--light);
+            border-radius: 12px;
+        }
+
+        .values-feature .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 10px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .values-feature h4 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .values-feature p {
+            font-size: 0.95rem;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        /* CTA Section */
+        .final-cta {
+            padding: 6rem 0;
+            background: var(--gradient);
+            color: white;
+            text-align: center;
+        }
+
+        .final-cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .final-cta p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .problem-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .problem-title {
+                position: static;
+            }
+
+            .values-preview {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .values-metrics {
+                justify-content: space-around;
+                gap: 1rem;
+            }
+
+            .value-cards-preview {
+                grid-template-columns: 1fr;
+            }
+
+            .values-demo {
+                padding: 1.5rem;
+            }
+
+            .demo-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .skill-tooltip {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90vw;
+                max-width: 300px;
+                z-index: 10000;
+            }
+
+            .skill-tooltip.tooltip-left {
+                left: 50%;
+                right: auto;
+                transform: translate(-50%, -50%);
+            }
+
+            .skill-tooltip.tooltip-center {
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .skill-tooltip::before,
+            .skill-tooltip.tooltip-left::before,
+            .skill-tooltip.tooltip-center::before {
+                display: none;
+            }
+
+            .product-preview {
+                overflow: visible;
+                transform: none;
+                padding: 1.5rem;
+            }
+
+            .product-preview:hover {
+                transform: none;
+            }
+
+            .skill-item {
+                padding: 1rem;
+            }
+
+            .skill-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            /* How It Works - Mobile */
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .step {
+                padding: 2rem 1.5rem;
+            }
+
+            .step-number {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+
+            .step h3 {
+                font-size: 1.3rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="light-particles">
+            <div class="light-particle"></div>
+            <div class="light-particle"></div>
+            <div class="light-particle"></div>
+            <div class="light-particle"></div>
+            <div class="light-particle"></div>
+            <div class="light-particle"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Luminate Your Path to True Performance</h1>
+                    <p class="tagline">Navigate beyond the OKR noise</p>
+                    <p style="font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.6; opacity: 0.95;">Finally, a performance management platform that focuses on what actually matters: how people do their jobs, contribute to culture, and grow in their careers. Not enterprise nonsense. Real performance management.</p>
+                    <a href="#solution" class="cta-button">See How It Works</a>
+                </div>
+                <div class="hero-visual">
+                    <div class="product-preview">
+                        <div class="preview-header">
+                            <div class="preview-dots">
+                                <div class="dot red"></div>
+                                <div class="dot yellow"></div>
+                                <div class="dot green"></div>
+                            </div>
+                            <span style="margin-left: auto; font-size: 0.9rem; color: #64748b;">Luminate</span>
+                        </div>
+                        <div class="preview-content">
+                            <div class="preview-title">Senior Software Engineer Role</div>
+                            <div class="skills-container">
+                                <div class="skill-item">
+                                    <div class="skill-content">
+                                        <div class="skill-icon prog">💻</div>
+                                        <div class="skill-details">
+                                            <div class="skill-name">Programming/Software Development</div>
+                                            <div class="skill-level">PROG - Level 5 (Expert)</div>
+                                        </div>
+                                    </div>
+                                    <div class="level-badge">L5</div>
+                                    <span class="skill-drag">⋮⋮</span>
+                                    <div class="skill-tooltip">
+                                        <div class="tooltip-header">
+                                            <div class="tooltip-icon prog">💻</div>
+                                            <div class="tooltip-title">Programming Level 5</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Expert Level Expectations</div>
+                                            <div class="tooltip-text">Architects complex software solutions and leads technical decisions across multiple projects.</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Good Performance</div>
+                                            <div class="example-item">Develops complex features with minimal guidance</div>
+                                            <div class="example-item">Mentors junior developers effectively</div>
+                                            <div class="example-item">Makes sound architectural decisions</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Exceptional Performance</div>
+                                            <div class="example-item">Leads cross-team technical initiatives</div>
+                                            <div class="example-item">Innovates novel solutions to complex problems</div>
+                                            <div class="example-item">Establishes new engineering standards</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="skill-item">
+                                    <div class="skill-content">
+                                        <div class="skill-icon desn">🏗️</div>
+                                        <div class="skill-details">
+                                            <div class="skill-name">Systems Design</div>
+                                            <div class="skill-level">DESN - Level 4 (Senior)</div>
+                                        </div>
+                                    </div>
+                                    <div class="level-badge">L4</div>
+                                    <span class="skill-drag">⋮⋮</span>
+                                    <div class="skill-tooltip">
+                                        <div class="tooltip-header">
+                                            <div class="tooltip-icon desn">🏗️</div>
+                                            <div class="tooltip-title">Systems Design Level 4</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Senior Level Expectations</div>
+                                            <div class="tooltip-text">Designs scalable system architectures and evaluates technical trade-offs effectively.</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Good Performance</div>
+                                            <div class="example-item">Creates clear system design documents</div>
+                                            <div class="example-item">Identifies performance bottlenecks early</div>
+                                            <div class="example-item">Considers scalability in all designs</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Exceptional Performance</div>
+                                            <div class="example-item">Anticipates future technical needs</div>
+                                            <div class="example-item">Designs systems that exceed requirements</div>
+                                            <div class="example-item">Influences product roadmap through design</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="skill-item">
+                                    <div class="skill-content">
+                                        <div class="skill-icon test">🧪</div>
+                                        <div class="skill-details">
+                                            <div class="skill-name">Testing</div>
+                                            <div class="skill-level">TEST - Level 4 (Senior)</div>
+                                        </div>
+                                    </div>
+                                    <div class="level-badge">L4</div>
+                                    <span class="skill-drag">⋮⋮</span>
+                                    <div class="skill-tooltip">
+                                        <div class="tooltip-header">
+                                            <div class="tooltip-icon test">🧪</div>
+                                            <div class="tooltip-title">Testing Level 4</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Senior Level Expectations</div>
+                                            <div class="tooltip-text">Implements comprehensive testing strategies and champions quality practices across the team.</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Good Performance</div>
+                                            <div class="example-item">Writes thorough unit and integration tests</div>
+                                            <div class="example-item">Designs effective test automation</div>
+                                            <div class="example-item">Ensures high code coverage</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Exceptional Performance</div>
+                                            <div class="example-item">Establishes testing best practices</div>
+                                            <div class="example-item">Reduces bug reports by 70%+</div>
+                                            <div class="example-item">Mentors team on quality practices</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="skill-item">
+                                    <div class="skill-content">
+                                        <div class="skill-icon scfg">⚙️</div>
+                                        <div class="skill-details">
+                                            <div class="skill-name">Software Configuration</div>
+                                            <div class="skill-level">SCFG - Level 4 (Senior)</div>
+                                        </div>
+                                    </div>
+                                    <div class="level-badge">L4</div>
+                                    <span class="skill-drag">⋮⋮</span>
+                                    <div class="skill-tooltip">
+                                        <div class="tooltip-header">
+                                            <div class="tooltip-icon scfg">⚙️</div>
+                                            <div class="tooltip-title">Software Configuration Level 4</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Senior Level Expectations</div>
+                                            <div class="tooltip-text">Manages complex deployment pipelines and ensures robust configuration management practices.</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Good Performance</div>
+                                            <div class="example-item">Maintains reliable CI/CD pipelines</div>
+                                            <div class="example-item">Implements infrastructure as code</div>
+                                            <div class="example-item">Ensures zero-downtime deployments</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Exceptional Performance</div>
+                                            <div class="example-item">Automates complex deployment scenarios</div>
+                                            <div class="example-item">Reduces deployment time by 50%+</div>
+                                            <div class="example-item">Creates reusable config templates</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="skill-item">
+                                    <div class="skill-content">
+                                        <div class="skill-icon scty">🔒</div>
+                                        <div class="skill-details">
+                                            <div class="skill-name">Information Security</div>
+                                            <div class="skill-level">SCTY - Level 4 (Senior)</div>
+                                        </div>
+                                    </div>
+                                    <div class="level-badge">L4</div>
+                                    <span class="skill-drag">⋮⋮</span>
+                                    <div class="skill-tooltip">
+                                        <div class="tooltip-header">
+                                            <div class="tooltip-icon scty">🔒</div>
+                                            <div class="tooltip-title">Information Security Level 4</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Senior Level Expectations</div>
+                                            <div class="tooltip-text">Implements comprehensive security measures and conducts thorough security assessments.</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Good Performance</div>
+                                            <div class="example-item">Conducts regular security code reviews</div>
+                                            <div class="example-item">Implements secure coding practices</div>
+                                            <div class="example-item">Maintains security compliance</div>
+                                        </div>
+                                        <div class="tooltip-section">
+                                            <div class="tooltip-label">Exceptional Performance</div>
+                                            <div class="example-item">Identifies and prevents security vulnerabilities</div>
+                                            <div class="example-item">Leads security training initiatives</div>
+                                            <div class="example-item">Develops security automation tools</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 12px; border-left: 4px solid var(--secondary);">
+                                <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 1rem; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">
+                                    ✨ <span>Performance matrix auto-generated from SFIA framework</span>
+                                </div>
+                                <div style="font-size: 0.9rem; color: var(--gray); line-height: 1.5;">
+                                    Hover over each skill to see detailed expectations and examples of good vs exceptional performance.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem">
+        <div class="container">
+            <div class="problem-grid">
+                <div class="problem-title">
+                    <h2>The Problems You're Facing</h2>
+                    <p class="problem-subtitle">Sound familiar? You're not alone.</p>
+                </div>
+                <div class="problem-list">
+                    <div class="problem-item">
+                        <h3>Inconsistent Role Definitions</h3>
+                        <p>Two "Senior Engineers" doing completely different work at different skill levels. Nobody knows what their role actually requires.</p>
+                    </div>
+                    <div class="problem-item">
+                        <h3>Lost Promotion Framework</h3>
+                        <p>People asking "what do I need to do to get promoted?" and managers having no clear answer. Growth conversations go nowhere.</p>
+                    </div>
+                    <div class="problem-item">
+                        <h3>Subjective Performance Reviews</h3>
+                        <p>Reviews based on gut feelings and comparisons to static criteria instead of role-specific expectations. Unfair for everyone.</p>
+                    </div>
+                    <div class="problem-item">
+                        <h3>Rising Standards, No Structure</h3>
+                        <p>Higher expectations as you grow, but no framework to communicate or assess them. New hires and existing team members confused.</p>
+                    </div>
+                    <div class="problem-item">
+                        <h3>Ineffective Manager Tools</h3>
+                        <p>Managers wing it during probation and performance reviews. No guidance, no consistency, no confidence.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution" id="solution">
+        <div class="container">
+            <h2>Introducing Luminate</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>SFIA-Based Framework</h3>
+                    <p>Built on proven industry standards. No reinventing the wheel, just clarity on what each level actually means.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🖱️</div>
+                    <h3>Drag & Drop Role Builder</h3>
+                    <p>Create precise role descriptions in minutes. Mix and match skills, set levels, define expectations clearly.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Auto-Generated Reviews</h3>
+                    <p>Performance matrices and manager prompts created automatically. Fair, consistent, role-specific assessments every time.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Clear Career Paths</h3>
+                    <p>Employees know exactly what's expected at their level and what they need to reach the next one. No more guesswork.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🛠️</div>
+                    <h3>Manager Enablement</h3>
+                    <p>Give your managers the tools and confidence to run effective probations and performance reviews.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚖️</div>
+                    <h3>Fair Performance Management</h3>
+                    <p>Objective, role-based assessments that work for both the business and employees. Raise standards without the drama.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cultural Values Assessment -->
+    <section class="cultural-values">
+        <div class="container">
+            <h2>Cultural Values Assessment</h2>
+            <p class="section-subtitle">Performance isn't just about skills - it's about how people embody your values</p>
+            
+            <div class="values-preview">
+                <div class="values-intro">
+                    <h3>Assess What Really Matters</h3>
+                    <p>Our platform includes interactive cultural assessments that measure alignment with your core values. No more gut-feeling evaluations - get clear, actionable insights into cultural fit.</p>
+                    
+                    <div class="values-metrics">
+                        <div class="metric">
+                            <div class="metric-number">4</div>
+                            <div class="metric-label">Core Values</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-number">5★</div>
+                            <div class="metric-label">Rating Scale</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-number">100%</div>
+                            <div class="metric-label">Engagement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="values-demo">
+                    <div class="demo-header">
+                        <h4>Live Cultural Assessment Demo</h4>
+                        <div class="progress-indicator">
+                            <div class="progress-bar-small">
+                                <div class="progress-fill-small"></div>
+                            </div>
+                            <span class="progress-text">75% Complete</span>
+                        </div>
+                    </div>
+                    
+                    <div class="value-cards-preview">
+                        <div class="value-card-mini active">
+                            <div class="value-icon-mini care-team">🤝</div>
+                            <div class="value-content-mini">
+                                <h5>Care Team First</h5>
+                                <div class="stars-mini">
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini">★</span>
+                                </div>
+                                <p>Advanced - Strong embodiment</p>
+                            </div>
+                        </div>
+
+                        <div class="value-card-mini">
+                            <div class="value-icon-mini stay-curious">🔍</div>
+                            <div class="value-content-mini">
+                                <h5>Stay Curious</h5>
+                                <div class="stars-mini">
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                </div>
+                                <p>Exemplary - Outstanding</p>
+                            </div>
+                        </div>
+
+                        <div class="value-card-mini">
+                            <div class="value-icon-mini good-humans">❤️</div>
+                            <div class="value-content-mini">
+                                <h5>Be Good Humans</h5>
+                                <div class="stars-mini">
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini filled">★</span>
+                                    <span class="star-mini">★</span>
+                                    <span class="star-mini">★</span>
+                                </div>
+                                <p>Proficient - Consistent</p>
+                            </div>
+                        </div>
+
+                        <div class="value-card-mini">
+                            <div class="value-icon-mini find-way">🚀</div>
+                            <div class="value-content-mini">
+                                <h5>Find a Way</h5>
+                                <div class="stars-mini loading">
+                                    <span class="star-mini">★</span>
+                                    <span class="star-mini">★</span>
+                                    <span class="star-mini">★</span>
+                                    <span class="star-mini">★</span>
+                                    <span class="star-mini">★</span>
+                                </div>
+                                <p class="awaiting">Click to rate...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-examples">
+                        <div class="example-popup">
+                            <h6>✨ What Good Looks Like:</h6>
+                            <ul>
+                                <li>Proactively offers help to teammates</li>
+                                <li>Prioritizes user needs over convenience</li>
+                                <li>Celebrates team wins over personal achievements</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="values-features">
+                <div class="values-feature">
+                    <div class="feature-icon">📊</div>
+                    <h4>Interactive Assessments</h4>
+                    <p>Engaging 5-star rating system with real-time feedback and examples of what good looks like.</p>
+                </div>
+                <div class="values-feature">
+                    <div class="feature-icon">🎯</div>
+                    <h4>Custom Values</h4>
+                    <p>Define your own cultural values or use our proven framework. Tailored to your organization's DNA.</p>
+                </div>
+                <div class="values-feature">
+                    <div class="feature-icon">📈</div>
+                    <h4>Progress Tracking</h4>
+                    <p>Visual progress indicators and detailed analytics show cultural alignment across teams.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2>How Luminate Works</h2>
+            <p class="section-subtitle">Four simple steps to transform your performance management</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Define Your Roles</h3>
+                    <p>Build skill matrices for each position using our drag-and-drop interface. From Junior Engineer to Senior Designer - create consistent job descriptions and clear expectations.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Generate Framework</h3>
+                    <p>Luminate automatically creates performance matrices, interview guides, and probation frameworks with behavioral examples for each skill level.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>AI-Powered Coaching</h3>
+                    <p>Enable managers with AI feedback assistance and empower employees with career guidance. Get real-time suggestions for meaningful conversations.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Track & Improve</h3>
+                    <p>Integrate cultural values assessment with performance reviews. Clear visibility into team performance and data-driven development decisions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Ready to Fix Performance Management?</h2>
+            <p>Join tech teams who've ditched the fluff for frameworks that actually work.</p>
+            <a href="#" class="cta-button">Get Early Access</a>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">No OKR nonsense. No enterprise bloat. Just clear expectations and fair reviews.</p>
+        </div>
+    </section>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Smart tooltip positioning function
+        function positionTooltip(item, tooltip) {
+            if (!tooltip || ('ontouchstart' in window)) return; // Skip on mobile
+            
+            const itemRect = item.getBoundingClientRect();
+            const tooltipWidth = 320;
+            const viewportWidth = window.innerWidth;
+            const margin = 20;
+
+            // Reset classes
+            tooltip.classList.remove('tooltip-left', 'tooltip-center');
+
+            // Check if there's space to the right
+            const spaceRight = viewportWidth - itemRect.right;
+            const spaceLeft = itemRect.left;
+
+            if (spaceRight >= tooltipWidth + margin) {
+                // Default: position to the right
+                // No additional classes needed
+            } else if (spaceLeft >= tooltipWidth + margin) {
+                // Position to the left
+                tooltip.classList.add('tooltip-left');
+            } else {
+                // Position above/center
+                tooltip.classList.add('tooltip-center');
+            }
+        }
+
+        // Enhanced skill item interactions with mobile support
+        document.querySelectorAll('.skill-item').forEach(item => {
+            const tooltip = item.querySelector('.skill-tooltip');
+            let isTooltipVisible = false;
+
+            // Desktop hover interactions
+            if (!('ontouchstart' in window)) {
+                item.addEventListener('mouseenter', function() {
+                    // Position tooltip smartly before showing
+                    positionTooltip(this, tooltip);
+                    
+                    this.style.transform = 'translateX(8px)';
+                    this.style.transition = 'transform 0.3s ease';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            }
+
+            // Mobile click interactions
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (tooltip) {
+                    if (!isTooltipVisible) {
+                        // Hide all other tooltips first
+                        document.querySelectorAll('.skill-tooltip').forEach(t => {
+                            t.style.opacity = '0';
+                            t.style.visibility = 'hidden';
+                        });
+
+                        // Position tooltip smartly (for tablets/hybrid devices)
+                        positionTooltip(this, tooltip);
+
+                        // Show this tooltip
+                        tooltip.style.opacity = '1';
+                        tooltip.style.visibility = 'visible';
+                        isTooltipVisible = true;
+
+                        // Add backdrop for mobile
+                        if ('ontouchstart' in window) {
+                            const backdrop = document.createElement('div');
+                            backdrop.className = 'tooltip-backdrop';
+                            backdrop.style.cssText = `
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: rgba(0, 0, 0, 0.3);
+                                z-index: 9999;
+                                backdrop-filter: blur(2px);
+                            `;
+                            document.body.appendChild(backdrop);
+
+                            backdrop.addEventListener('click', () => {
+                                tooltip.style.opacity = '0';
+                                tooltip.style.visibility = 'hidden';
+                                backdrop.remove();
+                                isTooltipVisible = false;
+                            });
+                        }
+                    } else {
+                        tooltip.style.opacity = '0';
+                        tooltip.style.visibility = 'hidden';
+                        isTooltipVisible = false;
+                        
+                        // Remove backdrop if exists
+                        const backdrop = document.querySelector('.tooltip-backdrop');
+                        if (backdrop) backdrop.remove();
+                    }
+                }
+            });
+        });
+
+        // Close tooltips when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.skill-item')) {
+                document.querySelectorAll('.skill-tooltip').forEach(tooltip => {
+                    tooltip.style.opacity = '0';
+                    tooltip.style.visibility = 'hidden';
+                });
+                
+                const backdrop = document.querySelector('.tooltip-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+        });
+
+        // Reposition tooltips on window resize
+        window.addEventListener('resize', function() {
+            document.querySelectorAll('.skill-item').forEach(item => {
+                const tooltip = item.querySelector('.skill-tooltip');
+                if (tooltip && tooltip.style.opacity === '1') {
+                    positionTooltip(item, tooltip);
+                }
+            });
+        });
+
+        // Animate features on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature, .problem-item, .step').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Cultural Values Demo Interactivity
+        const demoCard = document.querySelector('.value-card-mini:last-child');
+        const demoStars = demoCard?.querySelectorAll('.star-mini');
+        const demoText = demoCard?.querySelector('p');
+        const progressFill = document.querySelector('.progress-fill-small');
+        const progressText = document.querySelector('.progress-text');
+
+        if (demoCard && demoStars && demoText) {
+            let rating = 0;
+            let hasRated = false;
+
+            demoCard.addEventListener('click', () => {
+                if (!hasRated) {
+                    // Simulate user rating
+                    rating = 4;
+                    hasRated = true;
+
+                    // Remove loading animation
+                    demoStars.forEach(star => star.parentElement.classList.remove('loading'));
+
+                    // Add filled stars with animation
+                    demoStars.forEach((star, index) => {
+                        setTimeout(() => {
+                            if (index < rating) {
+                                star.classList.add('filled');
+                                star.style.transform = 'scale(1.2)';
+                                setTimeout(() => star.style.transform = 'scale(1)', 150);
+                            }
+                        }, index * 100);
+                    });
+
+                    // Update text
+                    setTimeout(() => {
+                        demoText.textContent = 'Advanced - Strong embodiment';
+                        demoText.classList.remove('awaiting');
+                        demoText.style.color = '#6b7280';
+                    }, 400);
+
+                    // Update progress
+                    setTimeout(() => {
+                        progressFill.style.width = '100%';
+                        progressText.textContent = '100% Complete';
+                    }, 800);
+
+                    // Add completion effect
+                    setTimeout(() => {
+                        const examplePopup = document.querySelector('.example-popup');
+                        if (examplePopup) {
+                            examplePopup.style.transform = 'scale(1.02)';
+                            examplePopup.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.15)';
+                            setTimeout(() => {
+                                examplePopup.style.transform = 'scale(1)';
+                                examplePopup.style.boxShadow = 'none';
+                            }, 300);
+                        }
+                    }, 1200);
+                }
+            });
+
+            // Add hover effect
+            demoCard.addEventListener('mouseenter', () => {
+                if (!hasRated) {
+                    demoCard.style.cursor = 'pointer';
+                    demoCard.style.transform = 'translateY(-2px) scale(1.02)';
+                }
+            });
+
+            demoCard.addEventListener('mouseleave', () => {
+                if (!hasRated) {
+                    demoCard.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        }
+
+        // Animate cultural values section on scroll
+        document.querySelectorAll('.value-card-mini, .values-feature').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Animate steps on scroll
+        document.querySelectorAll('.step').forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = `opacity 0.6s ease ${index * 0.15}s, transform 0.6s ease ${index * 0.15}s`;
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
